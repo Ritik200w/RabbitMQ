@@ -1,0 +1,78 @@
+# General configuration
+replicaCount: 3
+
+# Image configuration
+image:
+  repository: rabbitmq:3.11-management
+  pullPolicy: IfNotPresent
+
+# Kubernetes service account
+serviceAccount:
+  create: true
+  name: ""
+
+# Pod-level configuration
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  fsGroup: 1001
+
+securityContext:
+  runAsUser: 1001
+  runAsGroup: 1001
+
+# RabbitMQ StatefulSet configuration
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "500m"
+  limits:
+    memory: "1Gi"
+    cpu: "1"
+
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  size: 10Gi
+
+# RabbitMQ clustering configuration
+rabbitmq:
+  erlangCookie: "my-erlang-cookie" # Replace with a secure value
+  adminUser: "admin"
+  adminPassword: "securepassword" # Replace with a secure value
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 5672
+  managementPort: 15672
+
+# Liveness and readiness probes
+livenessProbe:
+  httpGet:
+    path: /api/healthchecks/node
+    port: 15672
+  initialDelaySeconds: 60
+  periodSeconds: 10
+readinessProbe:
+  httpGet:
+    path: /api/healthchecks/node
+    port: 15672
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+# Node placement configuration
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Autoscaling configuration
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
